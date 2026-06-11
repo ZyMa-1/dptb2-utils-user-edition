@@ -11,8 +11,8 @@ This is a fork of DPTB2 Utils with additional HUD features and custom modificati
 ## Features
 * **/tima** command from [poo](https://github.com/mine-guy/dptb2-poo-1.2.2/tree/master)
 * City door switch timer HUD
-* Micro timer warning sound
-* **/antitrafficlights** command, play warning sound 3 seconds before traffic light becomes red.
+* Option to turn on warning sound 10 seconds before the micro event.
+* **/antitrafficlights** command. Play warning sound 3 seconds before traffic lights becomes red.
 
 ## Installation
 
