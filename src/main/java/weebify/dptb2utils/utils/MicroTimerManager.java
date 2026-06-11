@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
@@ -23,6 +24,15 @@ public class MicroTimerManager {
             "§a§lJUMP BOOST",
             "§b§lSLIPPERY ICE"
     };
+
+    public static void playWarningSound() {
+        MinecraftClient.getInstance().getSoundManager().play(
+                PositionedSoundInstance.master(
+                        ModSounds.MICRO_WARNING,
+                        1.0F
+                )
+        );
+    }
 
     public static Text tickToTime(int ticks) {
         if (ticks < 0) {
@@ -44,11 +54,24 @@ public class MicroTimerManager {
         return timeText;
     }
 
+    public static void setTime(int minutes, int seconds) {
+        // Convert minutes and seconds to total ticks
+        int totalSeconds = (minutes * 60) + seconds;
+        microTimer = totalSeconds * 20;
+    }
+
     public static void initialize() {
         ClientTickEvents.START_CLIENT_TICK.register((mc) -> {
-            if (DPTB2Utils.getInstance().isInDPTB2) {
+            DPTB2Utils mod = DPTB2Utils.getInstance();
+            if (mod.isInDPTB2) {
                 if (MicroTimerManager.microTimer >= 0) {
                     MicroTimerManager.microTimer += 1;
+                    while (MicroTimerManager.microTimer >= 6020) {
+                        MicroTimerManager.microTimer -= 6000;
+                    }
+                    if (MicroTimerManager.microTimer == 5800 && mod.getBoolConfig("microTimer.playWarningSound")) {
+                        playWarningSound();
+                    }
                 }
             }
         });

@@ -21,6 +21,7 @@ public class ModConfigs {
     public Map<String, JsonElement> itemCooldownMap = new LinkedHashMap<>();
     public Map<String, JsonElement> waypointsMap = new LinkedHashMap<>();
     public Map<String, JsonElement> microTimerMap = new LinkedHashMap<>();
+    public Map<String, JsonElement> doorTimerMap = new LinkedHashMap<>();
 
     public static final Map<String, JsonElement> othersDefaultMap = new LinkedHashMap<>();
     public static final Map<String, JsonElement> notifsDefaultMap = new LinkedHashMap<>();
@@ -28,6 +29,7 @@ public class ModConfigs {
     public static final Map<String, JsonElement> itemCooldownDefaultMap = new LinkedHashMap<>();
     public static final Map<String, JsonElement> waypointsDefaultMap = new LinkedHashMap<>();
     public static final Map<String, JsonElement> microTimerDefaultMap = new LinkedHashMap<>();
+    public static final Map<String, JsonElement> doorTimerMapDefaultMap = new LinkedHashMap<>();
 
     public static Map<String, Class<?>> propertyTypes = new LinkedHashMap<>();
 
@@ -57,6 +59,7 @@ public class ModConfigs {
             case "itemCooldown" -> new Map[]{itemCooldownMap, itemCooldownDefaultMap};
             case "waypoints" -> new Map[]{waypointsMap, waypointsDefaultMap};
             case "microTimer" -> new Map[]{microTimerMap, microTimerDefaultMap};
+            case "doorTimer" -> new Map[]{doorTimerMap, doorTimerMapDefaultMap};
             default -> null;
         };
     }
@@ -123,8 +126,18 @@ public class ModConfigs {
         createNewConfig("microTimer.enabled", "false", Boolean.class);
         createNewConfig("microTimer.textShadow", "false", Boolean.class);
         createNewConfig("microTimer.renderBackground", "true", Boolean.class);
+        createNewConfig("microTimer.playWarningSound", "false", Boolean.class);
         createNewConfig("microTimer.posX", "0.25", Float.class);
         createNewConfig("microTimer.posY", "0.5", Float.class);
+
+        createNewConfig("doorTimer.enabled", "false", Boolean.class);
+        createNewConfig("doorTimer.textShadow", "false", Boolean.class);
+        createNewConfig("doorTimer.renderBackground", "true", Boolean.class);
+        createNewConfig("doorTimer.playWarningSound", "false", Boolean.class);
+        createNewConfig("doorTimer.posX", "0.5", Float.class);
+        createNewConfig("doorTimer.posY", "0.5", Float.class);
+
+        createNewConfig("others.trafficLightsWarning", "false", Boolean.class);
 
         createNewConfig("waypoints.enabled", "false", Boolean.class);
     }

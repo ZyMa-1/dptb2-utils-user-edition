@@ -2,11 +2,8 @@ package weebify.dptb2utils.gui.screen;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.EditBox;
-import net.minecraft.client.gui.hud.PlayerListHud;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.EditBoxWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import weebify.dptb2utils.DPTB2Utils;
@@ -51,6 +48,10 @@ public class ModMenuScreen extends Screen {
         this.addDrawableChild(ButtonWidget.builder(Text.of("Micro Event Timer HUD"), (btn) -> {
             mc.setScreen(new MicroTimerConfigScreen(this, mod));
         }).dimensions(this.width/2 - 80 - 75, 150, 150, 20).build());
+
+        this.addDrawableChild(ButtonWidget.builder(Text.of("Door Timer HUD"), (btn) -> {
+            mc.setScreen(new DoorTimerConfigScreen(this, mod));}
+        ).dimensions(this.width/2 + 80 - 75, 150, 150, 20).build());
 
 //        this.addDrawableChild(ButtonWidget.builder(Text.of(String.format("Waypoints: %s", mod.getBoolConfig("waypoints.enabled") ? "ON" : "OFF")), (btn) -> {
 //            btn.setMessage(Text.of(String.format("Waypoints: %s", mod.toggleBoolConfig("waypoints.enabled") ? "ON" : "OFF")));

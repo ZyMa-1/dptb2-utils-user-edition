@@ -87,6 +87,8 @@ public class DPTB2Utils implements ClientModInitializer {
 		ItemCooldownManager.initialize();
 		ExternalIndicatorManager.initialize();
 		MicroTimerManager.initialize();
+		DoorTimerManager.initialize();
+		TrafficLightsManager.initialize();
 
 		this.fetchDPTBotIP();
 
@@ -165,11 +167,15 @@ public class DPTB2Utils implements ClientModInitializer {
 		// detecting whether the player is in DPTB2
 		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
 			this.buttonTimerReset();
+			DoorTimerManager.resetDoorTimer();
+			TrafficLightsManager.reset();
 			this.scheduleTask(20, () -> this.dptb2Check(client));
 		});
 
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
 			this.buttonTimerReset();
+			DoorTimerManager.resetDoorTimer();
+			TrafficLightsManager.reset();
 			if (websocketClient != null && websocketClient.isOpen()) {
 				websocketClient.close();
 			}
@@ -243,6 +249,8 @@ public class DPTB2Utils implements ClientModInitializer {
 		ClientCommandRegistrationCallback.EVENT.register(this::commandBroadcast);
 //		ClientCommandRegistrationCallback.EVENT.register(this::commandAddWP);
 		ClientCommandRegistrationCallback.EVENT.register(this::commandToggleBc);
+		ClientCommandRegistrationCallback.EVENT.register(this::commandSetTimer);
+		ClientCommandRegistrationCallback.EVENT.register(this::commandAntiTrafficLights);
 	}
 
 	private void onClientTick(MinecraftClient var) {
@@ -286,6 +294,55 @@ public class DPTB2Utils implements ClientModInitializer {
 						})
 		);
 	}
+
+	private void commandSetTimer(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandRegistryAccess registryAccess) {
+		dispatcher.register(
+				ClientCommandManager.literal("tima")
+						.then(ClientCommandManager.argument("minutes", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0, 4))
+								.then(ClientCommandManager.argument("seconds", com.mojang.brigadier.arguments.IntegerArgumentType.integer(0, 59))
+										.executes(context -> {
+											int mins = com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(context, "minutes");
+											int secs = com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(context, "seconds");
+
+											MicroTimerManager.setTime(mins, secs);
+
+											context.getSource().sendFeedback(Text.literal("§aTimer set to §a" + mins + "m " + secs + "s"));
+											return 1;
+										})
+								)
+						)
+		);
+	}
+
+	private void commandAntiTrafficLights(CommandDispatcher<FabricClientCommandSource> dispatcher,
+	                                      CommandRegistryAccess registryAccess) {
+
+		dispatcher.register(
+				ClientCommandManager.literal("antitrafficlights")
+						.executes(context -> {
+
+							DPTB2Utils mod = DPTB2Utils.getInstance();
+
+							boolean enabled = mod.getBoolConfig("others.trafficLightsWarning");
+
+							mod.setConfig(
+									"others.trafficLightsWarning",
+									!enabled
+							);
+
+							context.getSource().sendFeedback(
+									Text.literal(
+											(!enabled ? "§a" : "§c")
+													+ "Anti Traffic Lights "
+													+ (!enabled ? "enabled." : "disabled.")
+									)
+							);
+
+							return 1;
+						})
+		);
+	}
+
 
 //	private void commandAddWP(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandRegistryAccess registryAccess) {
 //		LiteralCommandNode<FabricClientCommandSource> c = dispatcher.register(

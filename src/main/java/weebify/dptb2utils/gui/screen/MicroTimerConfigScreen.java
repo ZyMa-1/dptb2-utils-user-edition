@@ -37,6 +37,24 @@ public class MicroTimerConfigScreen extends Screen {
             btn.setMessage(Text.of(String.format("Render Background: %s", mod.toggleBoolConfig("microTimer.renderBackground") ? "ON" : "OFF")));
         }).dimensions(this.width/2 - 80 - 75, 100, 150, 20).build());
 
+        this.addDrawableChild(ButtonWidget.builder(
+                Text.of(String.format(
+                        "Warning Sound: %s",
+                        mod.getBoolConfig("microTimer.playWarningSound") ? "ON" : "OFF"
+                )),
+                (btn) -> {
+                    boolean enabled = mod.toggleBoolConfig("microTimer.playWarningSound");
+
+                    btn.setMessage(Text.of(String.format(
+                            "Warning Sound: %s",
+                            enabled ? "ON" : "OFF"
+                    )));
+                    if (enabled) {
+                        MicroTimerManager.playWarningSound();
+                    }
+                }
+        ).dimensions(this.width / 2 + 80 - 75, 100, 150, 20).build());
+
         this.textWidget = new DraggableMicroTimer(
                 mod.getFloatConfig("microTimer.posX"),
                 mod.getFloatConfig("microTimer.posY"),

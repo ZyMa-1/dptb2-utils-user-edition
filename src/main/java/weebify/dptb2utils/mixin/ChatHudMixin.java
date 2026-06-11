@@ -17,9 +17,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import weebify.dptb2utils.DPTB2Utils;
 import weebify.dptb2utils.gui.widget.NotificationToast;
-import weebify.dptb2utils.utils.ButtonTimerManager;
-import weebify.dptb2utils.utils.ItemCooldownManager;
-import weebify.dptb2utils.utils.MicroTimerManager;
+import weebify.dptb2utils.utils.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -157,13 +155,20 @@ public class ChatHudMixin {
                     .append(Text.literal(String.format("[%s] ", timestamp)).formatted(Formatting.GRAY)
                             .append(message));
             mod.bootsList.add(text);
-        } else if (mod.getBoolConfig("notifs.doorSwitch") && content.startsWith("* [!] The DOOR has cycled! Which one is it now?")) {
-            triggerNotif("Door Switch!", "The DOOR has cycled! Which one is it now?", 0xFFAA00, sound);
+        } else if (content.startsWith("* [!] The DOOR has cycled! Which one is it now?")) {
+            if (mod.getBoolConfig("notifs.doorSwitch")) {
+                triggerNotif("Door Switch!", "The DOOR has cycled! Which one is it now?", 0xFFAA00, sound);
+            }
+            DoorTimerManager.startDoorTimer();
+        } else if (content.startsWith("* STOP! Traffic Lights are RED!")) {
+            TrafficLightsManager.setRed();
+        } else if (content.startsWith("* GO! Traffic Lights are GREEN!")) {
+            TrafficLightsManager.setGreen();
         } else if (mod.getBoolConfig("others.autoCheer") && content.startsWith("* COMMUNITY GOAL!")) {
             if (mc.getNetworkHandler() != null) {
                 mod.scheduleTask(rand.nextInt(26) + 5, () -> mc.getNetworkHandler().sendChatCommand("cheer"));
             }
-        } else if (content.startsWith("* ➜ The BUTTON was just clicked")) {
+        } else if (content.startsWith("* ➜ The BUTTON was pressed")) {
             ButtonTimerManager.buttonTimer = 0; // reset the button timer
 
             // chaos button handling
