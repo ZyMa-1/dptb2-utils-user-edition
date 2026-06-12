@@ -22,6 +22,7 @@ public class ModConfigs {
     public Map<String, JsonElement> waypointsMap = new LinkedHashMap<>();
     public Map<String, JsonElement> microTimerMap = new LinkedHashMap<>();
     public Map<String, JsonElement> doorTimerMap = new LinkedHashMap<>();
+    public Map<String, JsonElement> toggleBCMap = new LinkedHashMap<>();
 
     public static final Map<String, JsonElement> othersDefaultMap = new LinkedHashMap<>();
     public static final Map<String, JsonElement> notifsDefaultMap = new LinkedHashMap<>();
@@ -30,6 +31,7 @@ public class ModConfigs {
     public static final Map<String, JsonElement> waypointsDefaultMap = new LinkedHashMap<>();
     public static final Map<String, JsonElement> microTimerDefaultMap = new LinkedHashMap<>();
     public static final Map<String, JsonElement> doorTimerMapDefaultMap = new LinkedHashMap<>();
+    public static final Map<String, JsonElement> toggleBCDefaultMap = new LinkedHashMap<>();
 
     public static Map<String, Class<?>> propertyTypes = new LinkedHashMap<>();
 
@@ -60,6 +62,7 @@ public class ModConfigs {
             case "waypoints" -> new Map[]{waypointsMap, waypointsDefaultMap};
             case "microTimer" -> new Map[]{microTimerMap, microTimerDefaultMap};
             case "doorTimer" -> new Map[]{doorTimerMap, doorTimerMapDefaultMap};
+            case "toggleBC" -> new Map[]{toggleBCMap, toggleBCDefaultMap};
             default -> null;
         };
     }
@@ -136,6 +139,10 @@ public class ModConfigs {
         createNewConfig("doorTimer.playWarningSound", "false", Boolean.class);
         createNewConfig("doorTimer.posX", "0.5", Float.class);
         createNewConfig("doorTimer.posY", "0.5", Float.class);
+
+        createNewConfig("toggleBC.enabled", "false", Boolean.class);
+        createNewConfig("toggleBC.posX", "0.1", Float.class);
+        createNewConfig("toggleBC.posY", "0.1", Float.class);
 
         createNewConfig("others.trafficLightsWarning", "false", Boolean.class);
 

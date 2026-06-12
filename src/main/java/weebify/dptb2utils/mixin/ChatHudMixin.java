@@ -164,6 +164,13 @@ public class ChatHudMixin {
             TrafficLightsManager.setRed();
         } else if (content.startsWith("* GO! Traffic Lights are GREEN!")) {
             TrafficLightsManager.setGreen();
+        } else if (content.contains("made it to the vault")) {
+            Matcher matcher = Pattern.compile("made it to the vault \\(\\+([\\d,]+)⛂\\)!").matcher(content);
+            if (matcher.find()) {
+                DPTB2Utils.claimedJackpotValue = Long.parseLong(
+                        matcher.group(1).replace(",", "")
+                );
+            }
         } else if (mod.getBoolConfig("others.autoCheer") && content.startsWith("* COMMUNITY GOAL!")) {
             if (mc.getNetworkHandler() != null) {
                 mod.scheduleTask(rand.nextInt(26) + 5, () -> mc.getNetworkHandler().sendChatCommand("cheer"));

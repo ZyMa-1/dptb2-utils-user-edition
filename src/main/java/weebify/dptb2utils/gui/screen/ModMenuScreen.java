@@ -52,6 +52,9 @@ public class ModMenuScreen extends Screen {
         this.addDrawableChild(ButtonWidget.builder(Text.of("Door Timer HUD"), (btn) -> {
             mc.setScreen(new DoorTimerConfigScreen(this, mod));}
         ).dimensions(this.width/2 + 80 - 75, 150, 150, 20).build());
+        this.addDrawableChild(ButtonWidget.builder(Text.of("ToggleBC HUD"), (btn) -> {
+            mc.setScreen(new ToggleBCConfigScreen(this, mod));}
+        ).dimensions(this.width/2 - 80 - 75, 175, 150, 20).build());
 
 //        this.addDrawableChild(ButtonWidget.builder(Text.of(String.format("Waypoints: %s", mod.getBoolConfig("waypoints.enabled") ? "ON" : "OFF")), (btn) -> {
 //            btn.setMessage(Text.of(String.format("Waypoints: %s", mod.toggleBoolConfig("waypoints.enabled") ? "ON" : "OFF")));

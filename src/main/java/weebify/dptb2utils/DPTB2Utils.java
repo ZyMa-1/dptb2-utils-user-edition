@@ -3,6 +3,7 @@ package weebify.dptb2utils;
 import com.google.gson.Gson;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import net.fabricmc.api.ClientModInitializer;
 
@@ -12,9 +13,11 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.command.CommandRegistryAccess;
+import net.minecraft.command.CommandSource;
 import net.minecraft.scoreboard.*;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -57,6 +60,7 @@ public class DPTB2Utils implements ClientModInitializer {
 	public DiscordWebSocketClient websocketClient;
 
 	public List<Text> bootsList = new ArrayList<>();
+	public static long claimedJackpotValue = -1;
 
 	public static DPTB2Utils getInstance() {
 		return instance;
@@ -164,6 +168,28 @@ public class DPTB2Utils implements ClientModInitializer {
 				this.scheduleTask(600, () -> this.dptb2Check(var));
 			}
 		});
+		// draw toggle bc hud
+		HudRenderCallback.EVENT.register((drawContext, tickCounter) -> {
+			MinecraftClient client = MinecraftClient.getInstance();
+
+			// Safety check to prevent the "Exit -1" crash
+			if (client.player == null || client.world == null) return;
+
+			// The logic: show if in DPTB2 mode AND (no screen open OR chat open)
+			if (this.isInDPTB2 && (client.currentScreen == null || client.currentScreen instanceof net.minecraft.client.gui.screen.ChatScreen)) {
+				if (this.getBoolConfig("toggleBC.enabled")) {
+					int sw = client.getWindow().getScaledWidth();
+					int sh = client.getWindow().getScaledHeight();
+
+					// Get positions from config
+					int x = (int) (sw * this.getFloatConfig("toggleBC.posX"));
+					int y = (int) (sh * this.getFloatConfig("toggleBC.posY"));
+
+					String status = this.isToggleBc ? "§aON" : "§cOFF";
+					drawContext.drawTextWithShadow(client.textRenderer, "§7ToggleBC: " + status, x, y, 0xFFFFFF);
+				}
+			}
+		});
 		// detecting whether the player is in DPTB2
 		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
 			this.buttonTimerReset();
@@ -251,6 +277,7 @@ public class DPTB2Utils implements ClientModInitializer {
 		ClientCommandRegistrationCallback.EVENT.register(this::commandToggleBc);
 		ClientCommandRegistrationCallback.EVENT.register(this::commandSetTimer);
 		ClientCommandRegistrationCallback.EVENT.register(this::commandAntiTrafficLights);
+		ClientCommandRegistrationCallback.EVENT.register(this::commandJackpotSplit);
 	}
 
 	private void onClientTick(MinecraftClient var) {
@@ -314,6 +341,64 @@ public class DPTB2Utils implements ClientModInitializer {
 		);
 	}
 
+	private void commandJackpotSplit(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandRegistryAccess registryAccess) {
+		dispatcher.register(
+				ClientCommandManager.literal("jsplit")
+						.then(ClientCommandManager.argument(
+												"players",
+												com.mojang.brigadier.arguments.IntegerArgumentType.integer(1)
+										)
+
+										.executes(context -> {
+											int players = com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(context, "players");
+											long jackpot = claimedJackpotValue;
+
+											if (jackpot <= 0) {
+												context.getSource().sendError(Text.literal("§cNo jackpot detected."));
+												return 0;
+											}
+
+											double paymentPerPlayer = jackpot * 0.75D / players;
+
+											context.getSource().sendFeedback(
+													Text.literal(String.format(
+															"§8▬▬▬▬▬▬▬▬▬▬\n§7Jackpot: §6%,d⛂\n§7Players: %d\n§7Pay each: §6%,d⛂\n§8▬▬▬▬▬▬▬▬▬▬",
+															jackpot,
+															players,
+															Math.round(paymentPerPlayer)
+													))
+											);
+
+											return 1;
+										})
+
+										.then(ClientCommandManager.argument(
+																"jackpot",
+																com.mojang.brigadier.arguments.LongArgumentType.longArg(1)
+														)
+
+														.executes(context -> {
+															int players = com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(context, "players");
+															long jackpot = com.mojang.brigadier.arguments.LongArgumentType.getLong(context, "jackpot");
+
+															double paymentPerPlayer = jackpot * 0.75D / players;
+
+															context.getSource().sendFeedback(
+																	Text.literal(String.format(
+																			"§8▬▬▬▬▬▬▬▬▬▬\n§7Jackpot: §6%,d⛂\n§7Players: %d\n§7Pay each: §6%,d⛂\n§8▬▬▬▬▬▬▬▬▬▬",
+																			jackpot,
+																			players,
+																			Math.round(paymentPerPlayer)
+																	))
+															);
+
+															return 1;
+														})
+										)
+						)
+		);
+	}
+
 	private void commandAntiTrafficLights(CommandDispatcher<FabricClientCommandSource> dispatcher,
 	                                      CommandRegistryAccess registryAccess) {
 
@@ -337,6 +422,10 @@ public class DPTB2Utils implements ClientModInitializer {
 													+ (!enabled ? "enabled." : "disabled.")
 									)
 							);
+
+							if(!enabled) {
+								TrafficLightsManager.playWarningSound();
+							}
 
 							return 1;
 						})
@@ -389,20 +478,36 @@ public class DPTB2Utils implements ClientModInitializer {
 		LiteralCommandNode<FabricClientCommandSource> c = dispatcher.register(
 				ClientCommandManager.literal("broadcast")
 						.then(ClientCommandManager.argument("message", StringArgumentType.greedyString())
-						.executes(context -> {
-							this.handleBroadcast(StringArgumentType.getString(context, "message"));
-							return 1;
-						})
-					)
+								.suggests((ctx, builder) -> {
+									String remaining = builder.getRemaining();
+									int lastSpace = remaining.lastIndexOf(' ');
+									SuggestionsBuilder offsetBuilder = builder.createOffset(
+											builder.getStart() + lastSpace + 1);
+									return CommandSource.suggestMatching(
+											ctx.getSource().getPlayerNames(), offsetBuilder);
+								})
+								.executes(context -> {
+									this.handleBroadcast(StringArgumentType.getString(context, "message"));
+									return 1;
+								})
+						)
 		);
 		dispatcher.register(
 				ClientCommandManager.literal("bc")
 						.then(ClientCommandManager.argument("message", StringArgumentType.greedyString())
-						.executes(context -> {
-							this.handleBroadcast(StringArgumentType.getString(context, "message"));
-							return 1;
-						}).redirect(c)
-					)
+								.suggests((ctx, builder) -> {
+									String remaining = builder.getRemaining();
+									int lastSpace = remaining.lastIndexOf(' ');
+									SuggestionsBuilder offsetBuilder = builder.createOffset(
+											builder.getStart() + lastSpace + 1);
+									return CommandSource.suggestMatching(
+											ctx.getSource().getPlayerNames(), offsetBuilder);
+								})
+								.executes(context -> {
+									this.handleBroadcast(StringArgumentType.getString(context, "message"));
+									return 1;
+								}).redirect(c)
+						)
 		);
 	}
 
