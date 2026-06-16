@@ -39,6 +39,16 @@ public class BankInfoManager {
         HudRenderCallback.EVENT.register(BankInfoManager::render);
     }
 
+    private static boolean isTntNpc(PlayerEntity player) {
+        double x = player.getX();
+        double y = player.getY();
+        double z = player.getZ();
+
+        return (x == -93.5 && y == 148.0 && z == 2.5)
+                || (x == -93.5 && y == 148.0 && z == 0.5)
+                || (x == -44.5 && y == 150.0 && z == 119.5);
+    }
+
     private static void updateTntPlayerCount(MinecraftClient mc) {
         int count = 0;
 
@@ -47,6 +57,9 @@ public class BankInfoManager {
         }
 
         for (PlayerEntity player : mc.world.getPlayers()) {
+            if (isTntNpc(player)) {
+                continue;
+            }
             ItemStack helmet =
                     player.getEquippedStack(EquipmentSlot.HEAD);
 

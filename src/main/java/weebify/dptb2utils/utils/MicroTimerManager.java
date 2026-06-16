@@ -69,7 +69,7 @@ public class MicroTimerManager {
                     while (MicroTimerManager.microTimer >= 6020) {
                         MicroTimerManager.microTimer -= 6000;
                     }
-                    if (MicroTimerManager.microTimer == 5800 && mod.getBoolConfig("microTimer.playWarningSound")) {
+                    if (MicroTimerManager.microTimer == 5700 && mod.getBoolConfig("microTimer.playWarningSound")) {
                         playWarningSound();
                     }
                 }
