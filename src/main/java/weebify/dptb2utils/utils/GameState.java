@@ -25,6 +25,7 @@ public class GameState {
 
     public void setClaimedJackpotValue(int claimedJackpotValue) {
         this.claimedJackpotValue = claimedJackpotValue;
+        this.currentJackpotValue = 100000;
     }
 
     public void setCurrentMap(MapType currentMap) {
