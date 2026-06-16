@@ -11,6 +11,7 @@ This is a fork of DPTB2 Utils with additional HUD features and custom modificati
 ## Features
 * Button timer fix (clicked -> pressed)
 * City door switch timer HUD
+* Wild West Bank info HUD
 * Option to turn on warning sound 10 seconds before the micro event.
 * ToggleBC draggable HUD from [poo](https://github.com/mine-guy/dptb2-poo-1.2.2/tree/master)
 * **/broadcast** **/bc** auto name completer from [poo](https://github.com/mine-guy/dptb2-poo-1.2.2/tree/master)

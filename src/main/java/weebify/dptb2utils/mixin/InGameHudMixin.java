@@ -16,7 +16,8 @@ public class InGameHudMixin {
     private void onSetOverlayMessage(Text message, boolean tinted, CallbackInfo ci) {
         GameState gameState = DPTB2Utils.getInstance().getGameState();
 
-        String text = message.getString();
+        String text = message.getString()
+                .replaceAll("§.", "");
 
         GameState.MapType newMap = null;
 

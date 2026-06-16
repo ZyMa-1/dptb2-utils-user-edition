@@ -172,6 +172,19 @@ public class ChatHudMixin {
                         matcher.group(1).replace(",", "")
                 ));
             }
+        } else if (content.contains("The jackpot has increased to")) {
+            Matcher matcher = Pattern.compile(
+                    "The jackpot has increased to ([\\d,]+)⛂!"
+            ).matcher(content);
+
+            if (matcher.find()) {
+                GameState gameState = mod.getGameState();
+                gameState.setCurrentJackpotValue(
+                        Integer.parseInt(
+                                matcher.group(1).replace(",", "")
+                        )
+                );
+            }
         } else if (mod.getBoolConfig("others.autoCheer") && content.startsWith("* COMMUNITY GOAL!")) {
             if (mc.getNetworkHandler() != null) {
                 mod.scheduleTask(rand.nextInt(26) + 5, () -> mc.getNetworkHandler().sendChatCommand("cheer"));

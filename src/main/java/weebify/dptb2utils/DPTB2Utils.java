@@ -36,7 +36,7 @@ import java.util.List;
 
 public class DPTB2Utils implements ClientModInitializer {	
 	public static final String MOD_ID = "dptb2-utils";
-	public static final String VERSION = "1.2.3";
+	public static final String VERSION = "1.2.4";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
 	public ModConfigs config;
@@ -98,6 +98,7 @@ public class DPTB2Utils implements ClientModInitializer {
 		DoorTimerManager.initialize();
 		TrafficLightsManager.initialize();
 		ToggleBCManager.initialize();
+		BankInfoManager.initialize();
 
 		this.fetchDPTBotIP();
 

@@ -9,8 +9,16 @@ public class GameState {
     }
 
     private int claimedJackpotValue = -1;
+    private int currentJackpotValue = -1;
     private MapType currentMap = MapType.UNKNOWN;
 
+    public int getCurrentJackpotValue() {
+        return currentJackpotValue;
+    }
+
+    public void setCurrentJackpotValue(int currentJackpotValue) {
+        this.currentJackpotValue = currentJackpotValue;
+    }
     public int getClaimedJackpotValue() {
         return claimedJackpotValue;
     }
