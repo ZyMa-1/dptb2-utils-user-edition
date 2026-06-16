@@ -13,7 +13,6 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.command.CommandRegistryAccess;
@@ -60,10 +59,15 @@ public class DPTB2Utils implements ClientModInitializer {
 	public DiscordWebSocketClient websocketClient;
 
 	public List<Text> bootsList = new ArrayList<>();
-	public static long claimedJackpotValue = -1;
+
+	private final GameState gameState = new GameState();
 
 	public static DPTB2Utils getInstance() {
 		return instance;
+	}
+
+	public GameState getGameState() {
+		return gameState;
 	}
 
 
@@ -93,6 +97,7 @@ public class DPTB2Utils implements ClientModInitializer {
 		MicroTimerManager.initialize();
 		DoorTimerManager.initialize();
 		TrafficLightsManager.initialize();
+		ToggleBCManager.initialize();
 
 		this.fetchDPTBotIP();
 
@@ -166,28 +171,6 @@ public class DPTB2Utils implements ClientModInitializer {
 			if (this.dptb2RecheckScheduled) {
 				this.dptb2RecheckScheduled = false;
 				this.scheduleTask(600, () -> this.dptb2Check(var));
-			}
-		});
-		// draw toggle bc hud
-		HudRenderCallback.EVENT.register((drawContext, tickCounter) -> {
-			MinecraftClient client = MinecraftClient.getInstance();
-
-			// Safety check to prevent the "Exit -1" crash
-			if (client.player == null || client.world == null) return;
-
-			// The logic: show if in DPTB2 mode AND (no screen open OR chat open)
-			if (this.isInDPTB2 && (client.currentScreen == null || client.currentScreen instanceof net.minecraft.client.gui.screen.ChatScreen)) {
-				if (this.getBoolConfig("toggleBC.enabled")) {
-					int sw = client.getWindow().getScaledWidth();
-					int sh = client.getWindow().getScaledHeight();
-
-					// Get positions from config
-					int x = (int) (sw * this.getFloatConfig("toggleBC.posX"));
-					int y = (int) (sh * this.getFloatConfig("toggleBC.posY"));
-
-					String status = this.isToggleBc ? "§aON" : "§cOFF";
-					drawContext.drawTextWithShadow(client.textRenderer, "§7ToggleBC: " + status, x, y, 0xFFFFFF);
-				}
 			}
 		});
 		// detecting whether the player is in DPTB2
@@ -351,7 +334,7 @@ public class DPTB2Utils implements ClientModInitializer {
 
 										.executes(context -> {
 											int players = com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(context, "players");
-											long jackpot = claimedJackpotValue;
+											int jackpot = this.gameState.getClaimedJackpotValue();
 
 											if (jackpot <= 0) {
 												context.getSource().sendError(Text.literal("§cNo jackpot detected."));

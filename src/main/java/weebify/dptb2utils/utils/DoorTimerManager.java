@@ -5,11 +5,9 @@ import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Formatting;
-import net.minecraft.sound.SoundEvents;
 import weebify.dptb2utils.DPTB2Utils;
 import weebify.dptb2utils.gui.screen.DoorTimerConfigScreen;
 
@@ -26,15 +24,6 @@ public class DoorTimerManager {
 
     public static void resetDoorTimer() {
         doorTimer = -1;
-    }
-
-    public static void playWarningSound() {
-        MinecraftClient.getInstance().getSoundManager().play(
-                PositionedSoundInstance.master(
-                        ModSounds.DOOR_WARNING,
-                        1.0F
-                )
-        );
     }
 
     public static Text tickToTime(int ticks) {
@@ -65,13 +54,8 @@ public class DoorTimerManager {
     public static void initialize() {
         ClientTickEvents.START_CLIENT_TICK.register((mc) -> {
             DPTB2Utils mod = DPTB2Utils.getInstance();
-            if (mod.isInDPTB2) {
-                if (doorTimer >= 0) {
-                    if (doorTimer == 200 && mod.getBoolConfig("doorTimer.playWarningSound")) {
-                        DoorTimerManager.playWarningSound();
-                    }
-                    doorTimer--;
-                }
+            if (mod.isInDPTB2 && doorTimer >= 0) {
+                doorTimer--;
             }
         });
 
@@ -81,9 +65,11 @@ public class DoorTimerManager {
     private static void renderDoorTimer(DrawContext drawContext, RenderTickCounter renderTickCounter) {
         MinecraftClient mc = MinecraftClient.getInstance();
         DPTB2Utils mod = DPTB2Utils.getInstance();
+        GameState gameState = mod.getGameState();
 
         if (mod.isInDPTB2
                 && mod.getBoolConfig("doorTimer.enabled")
+                && gameState.isCity()
                 && !(mc.currentScreen instanceof DoorTimerConfigScreen)) {
 
             int width = mc.getWindow().getScaledWidth();

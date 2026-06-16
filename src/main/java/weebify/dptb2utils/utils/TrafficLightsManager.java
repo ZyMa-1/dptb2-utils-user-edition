@@ -63,21 +63,15 @@ public class TrafficLightsManager {
     public static void initialize() {
         ClientTickEvents.START_CLIENT_TICK.register(mc -> {
             DPTB2Utils mod = DPTB2Utils.getInstance();
+            GameState gameState = mod.getGameState();
 
-            if (!mod.isInDPTB2) {
-                return;
-            }
-
-            if (mc.player == null) {
-                return;
-            }
-
-            if (trafficTimer < 0) {
+            if (!mod.isInDPTB2 || mc.player == null || trafficTimer < 0) {
                 return;
             }
 
             if (trafficTimer == WARNING_TIME_TICKS
                     && mod.getBoolConfig("others.trafficLightsWarning")
+                    && gameState.isCity()
                     && getTrafficDistance(mc.player) <= 40.0) {
 
                 playWarningSound();
@@ -85,9 +79,6 @@ public class TrafficLightsManager {
 
             trafficTimer--;
 
-            if (trafficTimer <= 0) {
-                reset();
-            }
         });
     }
 }

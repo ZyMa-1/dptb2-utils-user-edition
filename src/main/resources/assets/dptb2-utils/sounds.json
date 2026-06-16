@@ -4,11 +4,6 @@
       "dptb2-utils:traffic_warning"
     ]
   },
-  "door_warning": {
-    "sounds": [
-      "dptb2-utils:door_warning"
-    ]
-  },
   "micro_warning": {
     "sounds": [
       "dptb2-utils:micro_warning"

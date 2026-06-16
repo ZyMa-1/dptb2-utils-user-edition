@@ -10,11 +10,6 @@ public class ModSounds {
             SoundEvent.of(
                     Identifier.of(DPTB2Utils.MOD_ID, "traffic_warning")
             );
-
-    public static final SoundEvent DOOR_WARNING =
-            SoundEvent.of(
-                    Identifier.of(DPTB2Utils.MOD_ID, "door_warning")
-            );
     public static final SoundEvent MICRO_WARNING =
             SoundEvent.of(
                     Identifier.of(DPTB2Utils.MOD_ID, "micro_warning")

@@ -136,7 +136,6 @@ public class ModConfigs {
         createNewConfig("doorTimer.enabled", "false", Boolean.class);
         createNewConfig("doorTimer.textShadow", "false", Boolean.class);
         createNewConfig("doorTimer.renderBackground", "true", Boolean.class);
-        createNewConfig("doorTimer.playWarningSound", "false", Boolean.class);
         createNewConfig("doorTimer.posX", "0.5", Float.class);
         createNewConfig("doorTimer.posY", "0.5", Float.class);
 

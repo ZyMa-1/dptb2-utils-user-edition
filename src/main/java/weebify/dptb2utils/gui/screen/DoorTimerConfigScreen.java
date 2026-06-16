@@ -7,7 +7,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import weebify.dptb2utils.DPTB2Utils;
 import weebify.dptb2utils.gui.widget.DraggableDoorTimer;
-import weebify.dptb2utils.utils.DoorTimerManager;
 
 public class DoorTimerConfigScreen extends Screen {
 
@@ -62,24 +61,6 @@ public class DoorTimerConfigScreen extends Screen {
                     )));
                 }
         ).dimensions(this.width / 2 - 80 - 75, 100, 150, 20).build());
-
-        this.addDrawableChild(ButtonWidget.builder(
-                Text.of(String.format(
-                        "Warning Sound: %s",
-                        mod.getBoolConfig("doorTimer.playWarningSound") ? "ON" : "OFF"
-                )),
-                (btn) -> {
-                    boolean enabled = mod.toggleBoolConfig("doorTimer.playWarningSound");
-
-                    btn.setMessage(Text.of(String.format(
-                            "Warning Sound: %s",
-                            enabled ? "ON" : "OFF"
-                    )));
-                    if (enabled) {
-                        DoorTimerManager.playWarningSound();
-                    }
-                }
-        ).dimensions(this.width / 2 + 80 - 75, 100, 150, 20).build());
 
         this.textWidget = new DraggableDoorTimer(
                 mod.getFloatConfig("doorTimer.posX"),

@@ -167,9 +167,10 @@ public class ChatHudMixin {
         } else if (content.contains("made it to the vault")) {
             Matcher matcher = Pattern.compile("made it to the vault \\(\\+([\\d,]+)⛂\\)!").matcher(content);
             if (matcher.find()) {
-                DPTB2Utils.claimedJackpotValue = Long.parseLong(
+                GameState gameState = mod.getGameState();
+                gameState.setClaimedJackpotValue(Integer.parseInt(
                         matcher.group(1).replace(",", "")
-                );
+                ));
             }
         } else if (mod.getBoolConfig("others.autoCheer") && content.startsWith("* COMMUNITY GOAL!")) {
             if (mc.getNetworkHandler() != null) {

@@ -12,7 +12,8 @@
     "ChatHudMixin",
     "DrawContextInvoker",
     "EntityRendererMixin",
-    "PlayerListHudMixin"
+    "PlayerListHudMixin",
+    "InGameHudMixin"
   ],
   "mixins": [
     "TextVisitFactoryMixin"
